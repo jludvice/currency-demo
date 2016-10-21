@@ -17,7 +17,7 @@
  * limitations under the License.
  * #L%
  */
-package org.test;
+package org.jboss.hello;
 
 public class MyBean {
 

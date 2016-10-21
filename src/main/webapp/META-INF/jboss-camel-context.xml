@@ -49,11 +49,5 @@
       <from id="_from3" uri="timer:greeter?period=30s"/>
       <log id="welcomeLog" loggingLevel="WARN" message="Welcome to Fuse on EAP Course :)"/>
     </route>
-    <route id="hello-route">
-      <from id="_from5" uri="direct:hello"/>
-      <transform>
-        <simple>Hello ${body}!</simple>
-      </transform>
-    </route>
   </camelContext>
 </beans>
