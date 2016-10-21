@@ -19,7 +19,8 @@
  */
 package org.test;
 
-import java.io.IOException;
+import org.apache.camel.CamelContext;
+import org.apache.camel.ProducerTemplate;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletException;
@@ -28,25 +29,26 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
-import org.apache.camel.CamelContext;
-import org.apache.camel.ProducerTemplate;
-
-@WebServlet(name = "HttpServiceServlet", urlPatterns = { "/*" }, loadOnStartup = 1)
+@WebServlet(name = "HttpServiceServlet", urlPatterns = {"/hello"}, loadOnStartup = 1)
 public class MyServlet extends HttpServlet {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	@Resource(name = "java:jboss/camel/context/spring-context")
-	private CamelContext camelContext;
+
+    private static final long serialVersionUID = 1L;
+
+    @Resource(name = "java:jboss/camel/context/spring-context")
+    private CamelContext camelContext;
 
     @Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         String name = req.getParameter("name");
-    	ServletOutputStream out = res.getOutputStream();
-        ProducerTemplate producer = camelContext.createProducerTemplate();
-        String result = producer.requestBody("direct:start", name, String.class);
-    	out.print(result);
+        if (name == null) {
+            name = "World";
+        }
+
+        final ServletOutputStream out = res.getOutputStream();
+        final ProducerTemplate producer = camelContext.createProducerTemplate();
+        final String result = producer.requestBody("direct:hello", name, String.class);
+        out.print(result);
     }
 }
