@@ -22,6 +22,31 @@
         <json library="Jackson" prettyPrint="true"/>
       </marshal>
     </route>
+    <route id="rates">
+      <from id="_from1" uri="servlet:rates"/>
+      <to id="_to3" uri="sql:select * from currencyexchange?dataSource=MyCamelDS"/>
+      <marshal id="_marshal1">
+        <json library="Jackson" prettyPrint="true"/>
+      </marshal>
+    </route>
+    <route id="currency-convert">
+      <from id="_from2" uri="servlet:/currency"/>
+      <log id="_log1" message="Got currency: ${headers.currency} and amt ${headers.amt}"/>
+      <choice id="_choice1">
+        <when id="_when1">
+          <header>currency</header>
+          <to id="_to4" uri="sql:select * from currencyexchange where currencycode= :#currency ?dataSource=MyCamelDS"/>
+          <log id="_log2" message="converting to currency ${body}"/>
+          <bean id="_bean1" method="convertUSD(${headers.amt},${body})" ref="currencyconvertor"/>
+        </when>
+        <otherwise id="_otherwise1">
+          <log id="_log3" message="nothing to lookup"/>
+          <setBody id="defaultResponse">
+            <constant>you need to specify query param 'currency'</constant>
+          </setBody>
+        </otherwise>
+      </choice>
+    </route>
     <route id="welcome-route">
       <from id="_from3" uri="timer:greeter?period=30s&amp;repeatCount=3"/>
       <log id="welcomeLog" loggingLevel="WARN" message="Welcome to Fuse on EAP Course :)"/>
