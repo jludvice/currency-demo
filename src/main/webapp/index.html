@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="US-ASCII">
+<title>Camel CDI Currency Converter Demo</title>
+<link
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+	rel="stylesheet"
+	integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+	crossorigin="anonymous">
+<script
+	src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.js"></script>
+<script
+	src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+<script>
+
+        // define angular module/app
+        var currencyapp = angular.module('currencyapp', []);
+        currencyapp.controller('CurrencyListCtrl', function ($scope, $http) {
+            $http.get('services/rates').success(function (data) {
+                $scope.rates = data;
+            });
+        });
+
+        var formapp = angular.module('formapp', []);
+        formapp.controller('formContrl', function ($scope, $http) {
+
+            console.log('formContrl called!');
+
+            $http.get('services/currencies').success(function (data) {
+                $scope.currencies = data;
+            });
+            
+            // process the form
+            $scope.processForm = function (amt, inputcurrency) {
+
+                formData = {
+                    amt: amt,
+                    currency: inputcurrency
+                };
+                console.log(formData);
+
+                $http({
+                    method: 'POST',
+                    url: 'services/currency',
+                    data: $.param(formData),   // pass in data as strings
+                    headers: {'Content-Type': 'application/x-www-form-urlencoded'}  // set the headers so angular passing info as form data (not request payload)
+                })
+                        .success(function (data) {
+                            console.log('amt:[' + amt + ']');
+                            console.log('inputcurrency:[' + inputcurrency + ']');
+
+                            if (!data.success) {
+                                $scope.message = data;
+                            } else {
+                                console.log(data);
+                                $scope.message = data;
+                            }
+                        });
+            };
+        });
+
+        angular.module("CombineModule", ["currencyapp", "formapp"]);
+    </script>
+</head>
+
+<body ng-app="CombineModule">
+	<div class="container">
+		<h1>This example demonstrate how to develop your camel
+			application Using Spring DSL.</h1>
+
+
+		<h2>Convert exchange rate form</h2>
+		<div ng-controller="formContrl" class="form" class="container">
+			<form name="myForm" ng-submit="processForm(amt,currency)">
+				<div class="form-group">
+					<label for="amount">Amount to convert</label> <input type="text"
+						class="form-control" id="amount" placeholder="1.0" ng-model="amt"
+						type="number" min="0" max="1000" required>
+				</div>
+
+				<div class="form-group">
+					<label for="currency">Currency</label> <select class="form-control"
+						name="currency" id="currency" class="form-control"
+						ng-model="currency" required
+						ng-options="item.CODE as item.NAME for item in currencies ">
+					</select>
+				</div>
+
+				<button type="submit" class="btn btn-success btn-lg btn-block">
+					<span class="glyphicon glyphicon-flash"></span> Submit!
+				</button>
+
+				<BR />
+
+				<div class="alert alert-info">
+					<p>USD $ {{amt}} coverts to {{currency}} $ {{message}}</p>
+				</div>
+			</form>
+		</div>
+
+
+		<h2>Exchange Currency List</h2>
+		<div ng-controller="CurrencyListCtrl">
+			<table border="1" class="table table-striped">
+				<tr ng-repeat="x in rates">
+					<td>{{x.CURRENCYCODE}}</td>
+					<td>{{x.CURRENCYNAME}}</td>
+					<td>{{x.RATE}}</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+</body>
+</html>
