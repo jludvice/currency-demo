@@ -15,10 +15,11 @@ Goal of this demo is to fill two missing camel routes in exchange rates applicat
 Application is composed of web interface on `http://locahost:8080/DEPLOYMENT-NAME/`
 and it calls rest resources on `http://locahost:8080/DEPLOYMENT-NAME/services/*`
 
-There is one route prepared for you on `http://localhost:8080/DEPLOYMENT-NAME/services/currencies`.
+There is one camel route prepared for you. 
+It provides list of available currencies on url `http://localhost:8080/DEPLOYMENT-NAME/services/currencies`.
 It's used to populate list of available currencies on web page.
 
-There is servlet named `CamelServlet` with servlet mapping `/services/*`
+There is servlet named `CamelServlet` with servlet mapping `/services/*`.
 Camel routes producing `servlet` endpoints will be bound to this servlet by default.
 
 ### Route 'rates'
@@ -47,6 +48,6 @@ It should consume two query parameters:
 * `amt` (eg. `3.21`).
 
 Example:  
-requsest to url `http://localhost:8080/DEPLOYMENT-NAME/services/currency?currency=EUR&amt=3.21`  
+request to url `http://localhost:8080/DEPLOYMENT-NAME/services/currency?currency=EUR&amt=3.21`  
 should return number, something like  `2.683896261`
 
